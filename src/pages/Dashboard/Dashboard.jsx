@@ -3,9 +3,9 @@ import { makeStyles } from '@mui/styles'
 
 import { Helmet } from 'react-helmet-async'
 
-// import EmptyContent from './content/EmptyContent/EmptyContent'
+import Knapsack from './content/Knapsack/Knapsack'
 
-// import { Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 // import logoTrans from '../../assets/images/placeholder-logo.png'
 
@@ -60,7 +60,7 @@ const Dashboard = props => {
   return (
     <div className={classes.root}>
       <Helmet>
-        <title>Dashboard</title>
+        <title>Knapsack Visualizer</title>
       </Helmet>
       <div className={classes.header}>
         {/* <div className={classes.logoContainer}>
@@ -69,8 +69,12 @@ const Dashboard = props => {
         Knapsack Visualizer
       </div>
       <div className={classes.body}>
-        <div className={classes.sidebar}>SIDEBAR</div>
-        <div className={classes.content}>CONTENT</div>
+        <div className={classes.sidebar}>Controls here</div>
+        <div className={classes.content}>
+          <Routes>
+            <Route path="*" element={<Knapsack />} />
+          </Routes>
+        </div>
       </div>
     </div>
   )
