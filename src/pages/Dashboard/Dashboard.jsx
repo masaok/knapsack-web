@@ -3,7 +3,8 @@ import { makeStyles } from '@mui/styles'
 
 import { Helmet } from 'react-helmet-async'
 
-import Knapsack from './content/Knapsack/Knapsack'
+import KnapsackDynamic from './content/KnapsackDynamic/KnapsackDynamic'
+// import KnapsackRecursion from './content/KnapsackRecursion/KnapsackRecursion'
 
 import { Routes, Route } from 'react-router-dom'
 
@@ -72,7 +73,8 @@ const Dashboard = props => {
         <div className={classes.sidebar}>Controls here</div>
         <div className={classes.content}>
           <Routes>
-            <Route path="*" element={<Knapsack />} />
+            <Route path="*" element={<KnapsackDynamic />} />
+            {/* <Route path="*" element={<KnapsackRecursion />} /> */}
           </Routes>
         </div>
       </div>
