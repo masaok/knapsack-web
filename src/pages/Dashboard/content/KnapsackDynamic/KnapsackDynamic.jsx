@@ -22,6 +22,10 @@ const useStyles = makeStyles(
       flexDirection: 'column',
     },
 
+    table: {
+      margin: theme.spacing(1),
+    },
+
     empty: {},
 
     latest: {
@@ -98,8 +102,6 @@ const KnapsackDynamic = props => {
   // const [table, setTable] = useState(new Array(NUM_ITEMS + 1))
 
   const timer = useCallback(() => {
-    // console.log(`S ${seconds} ROW ${row} COL ${col}`)
-    // tableDump(table)
     if (col <= maxCol) {
       console.log(`ROW ${row} COL ${col} (NEW COL)`)
       console.log(`CREATING NEW COL AT ROW ${row} AND COL ${col}`)
@@ -196,7 +198,8 @@ const KnapsackDynamic = props => {
         <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
         <div>MAX WEIGHT: {MAX_WEIGHT}</div>
       </div>
-      <div>
+
+      <div className={classes.table}>
         <TableContainer component={Paper}>
           <Table aria-label="info table" size="small">
             <TableHead>
@@ -209,13 +212,14 @@ const KnapsackDynamic = props => {
               {VALUES.map((value, valueIndex) => {
                 return (
                   <TableRow key={valueIndex}>
-                    <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row" align="center">
                       {WEIGHTS[valueIndex]}
                     </TableCell>
                     <TableCell
                       className={valueIndex === addendValueIndex ? classes.sum : classes.empty}
                       component="th"
                       scope="row"
+                      align="center"
                     >
                       {value}
                     </TableCell>
@@ -227,14 +231,18 @@ const KnapsackDynamic = props => {
         </TableContainer>
       </div>
 
-      <div>
+      <div className={classes.table}>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="knapsack table" size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Number of Items</TableCell>
+                <TableCell align="center">Number of Items</TableCell>
                 {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
-                  return <TableCell key={colIndex}>{colIndex}</TableCell>
+                  return (
+                    <TableCell key={colIndex} align="center">
+                      {colIndex}
+                    </TableCell>
+                  )
                 })}
               </TableRow>
             </TableHead>
@@ -245,7 +253,7 @@ const KnapsackDynamic = props => {
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   // className={classes.latest}
                 >
-                  <TableCell component="th" scope="row" key={rowIndex}>
+                  <TableCell component="th" scope="row" key={rowIndex} align="center">
                     {rowIndex}
                   </TableCell>
                   {trow.map((tcol, colIndex) => {
@@ -268,6 +276,7 @@ const KnapsackDynamic = props => {
                             : classes.empty,
                           sumRow === rowIndex && sumCol === colIndex ? classes.sum : classes.empty
                         )}
+                        align="center"
                       >
                         {tcol}
                       </TableCell>
