@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react'
 import { makeStyles } from '@mui/styles'
 
+import clsx from 'clsx'
+
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -14,6 +16,25 @@ const useStyles = makeStyles(
     root: {
       display: 'flex',
     },
+
+    info: {
+      display: 'flex',
+      flexDirection: 'column',
+    },
+
+    empty: {},
+
+    latest: {
+      backgroundColor: 'lightgreen',
+    },
+
+    source: {
+      backgroundColor: 'lightblue',
+    },
+
+    sum: {
+      backgroundColor: 'lavender',
+    },
   }),
   { name: 'KnapsackDynamic' }
 )
@@ -24,15 +45,15 @@ const useStyles = makeStyles(
 // const MAX_WEIGHT = 2
 
 // Dev
-// const VALUES = [6, 10, 12]
-// const WEIGHTS = [1, 2, 3]
-// const MAX_WEIGHT = 5
+const VALUES = [6, 10, 12]
+const WEIGHTS = [1, 2, 3]
+const MAX_WEIGHT = 5
 
 // Geeks example
 // https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
-const VALUES = [10, 15, 40]
-const WEIGHTS = [1, 2, 3]
-const MAX_WEIGHT = 6
+// const VALUES = [10, 15, 40]
+// const WEIGHTS = [1, 2, 3]
+// const MAX_WEIGHT = 6
 
 const NUM_ITEMS = VALUES.length
 const MS = 100
@@ -45,12 +66,6 @@ const MS = 100
 // maximum of two integers
 const max = (a, b) => {
   return a > b ? a : b
-}
-
-const dump = (maxWeight, weights, values, numItems, depth) => {
-  console.log(`DEPTH: ${depth}, MAX: ${maxWeight}, NUM ITEMS: ${numItems}`)
-  console.log('VALUES: ' + JSON.stringify(values))
-  console.log('WEIGHTS:' + JSON.stringify(weights))
 }
 
 const tableDump = table => {
@@ -68,6 +83,12 @@ const KnapsackDynamic = props => {
 
   const [maxRow] = useState(NUM_ITEMS)
   const [maxCol] = useState(MAX_WEIGHT)
+
+  const [sourceRow, setSourceRow] = useState(0)
+  const [sourceCol, setSourceCol] = useState(0)
+
+  const [sumRow, setSumRow] = useState(0)
+  const [sumCol, setSumCol] = useState(0)
 
   // const [maxRow] = useState(1) // dev mode
   // const [maxCol] = useState(2) // dev mode
@@ -96,12 +117,16 @@ const KnapsackDynamic = props => {
 
         const sumB = table[row - 1][col - WEIGHTS[row - 1]]
         console.log(`NEW VAL SUM B ${sumB}`)
+        setSumRow(row - 1)
+        setSumCol(col - WEIGHTS[row - 1])
 
         const newVal = VALUES[row - 1] + table[row - 1][col - WEIGHTS[row - 1]]
         console.log(`NEW VAL ${newVal}`)
 
         const prevRowVal = table[row - 1][col]
         console.log(`PREV ROW VAL ${prevRowVal}`)
+        setSourceRow(row - 1)
+        setSourceCol(col)
 
         const newMax = max(
           VALUES[row - 1] + table[row - 1][col - WEIGHTS[row - 1]],
@@ -114,6 +139,11 @@ const KnapsackDynamic = props => {
         const prevRowVal = table[row - 1][col]
         console.log(`NO COMP, PREV ROW VAL ${prevRowVal}`)
         table[row].push(table[row - 1][col])
+
+        setSourceRow(row - 1)
+        setSourceCol(col)
+
+        tableDump(table)
       }
 
       setCol(col + 1)
@@ -177,28 +207,56 @@ const KnapsackDynamic = props => {
   // console.log('RETURNING:')
   return (
     <div className={classes.root}>
-      <div>VALUES: {JSON.stringify(VALUES, null, 2)}</div>
-      <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
-      <div>MAX WEIGHT: {MAX_WEIGHT}</div>
+      <div className={classes.info}>
+        <div>VALUES: {JSON.stringify(VALUES, null, 2)}</div>
+        <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
+        <div>MAX WEIGHT: {MAX_WEIGHT}</div>
+      </div>
       {/* {knapsack(MAX_WEIGHT, WEIGHTS, VALUES, VALUES.length)} */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table" size="small">
           <TableHead>
             <TableRow>
               <TableCell>Number of Items</TableCell>
-              {table[0].map((col, colIndex) => {
+              {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
                 return <TableCell key={colIndex}>{colIndex}</TableCell>
               })}
             </TableRow>
           </TableHead>
           <TableBody>
-            {table.map((row, rowIndex) => (
-              <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            {table.map((trow, rowIndex) => (
+              <TableRow
+                key={rowIndex}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                // className={classes.latest}
+              >
                 <TableCell component="th" scope="row" key={rowIndex}>
                   {rowIndex}
                 </TableCell>
-                {row.map((col, colIndex) => {
-                  return <TableCell key={colIndex}>{col}</TableCell>
+                {trow.map((tcol, colIndex) => {
+                  // console.log(`ROW ${row} COL ${col} TROWi ${rowIndex} TCOLi ${colIndex}`)
+
+                  // console.log(
+                  //   `ROW ${row} SROW ${sourceRow} RI ${rowIndex} COL ${col} SCOL ${sourceCol} CI ${colIndex}`
+                  // )
+
+                  console.log(
+                    `ROW ${row} SROW ${sumRow} RI ${rowIndex} COL ${col} SCOL ${sumCol} CI ${colIndex}`
+                  )
+                  return (
+                    <TableCell
+                      key={colIndex}
+                      className={clsx(
+                        row === rowIndex && col === colIndex + 1 ? classes.latest : classes.empty,
+                        sourceRow === rowIndex && sourceCol === colIndex
+                          ? classes.source
+                          : classes.empty,
+                        sumRow === rowIndex && sumCol === colIndex ? classes.sum : classes.empty
+                      )}
+                    >
+                      {tcol}
+                    </TableCell>
+                  )
                 })}
               </TableRow>
             ))}

@@ -70,7 +70,7 @@ const Dashboard = props => {
         Knapsack Visualizer
       </div>
       <div className={classes.body}>
-        <div className={classes.sidebar}>Controls here</div>
+        <div className={classes.sidebar}></div>
         <div className={classes.content}>
           <Routes>
             <Route path="*" element={<KnapsackDynamic />} />
