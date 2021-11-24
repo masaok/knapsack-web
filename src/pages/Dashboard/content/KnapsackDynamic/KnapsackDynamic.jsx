@@ -56,7 +56,7 @@ const MAX_WEIGHT = 5
 // const MAX_WEIGHT = 6
 
 const NUM_ITEMS = VALUES.length
-const MS = 100
+const MS = 1000
 
 /* A Naive recursive implementation of 0-1 Knapsack problem
  * Credit: https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
@@ -84,11 +84,13 @@ const KnapsackDynamic = props => {
   const [maxRow] = useState(NUM_ITEMS)
   const [maxCol] = useState(MAX_WEIGHT)
 
-  const [sourceRow, setSourceRow] = useState(0)
-  const [sourceCol, setSourceCol] = useState(0)
+  const [sourceRow, setSourceRow] = useState(null)
+  const [sourceCol, setSourceCol] = useState(null)
 
-  const [sumRow, setSumRow] = useState(0)
-  const [sumCol, setSumCol] = useState(0)
+  const [sumRow, setSumRow] = useState(null)
+  const [sumCol, setSumCol] = useState(null)
+
+  const [addendValueIndex, setAddendValueIndex] = useState(null)
 
   // const [maxRow] = useState(1) // dev mode
   // const [maxCol] = useState(2) // dev mode
@@ -102,6 +104,13 @@ const KnapsackDynamic = props => {
       console.log(`ROW ${row} COL ${col} (NEW COL)`)
       console.log(`CREATING NEW COL AT ROW ${row} AND COL ${col}`)
 
+      // Reset all highlights
+      setAddendValueIndex(null)
+      setSumRow(null)
+      setSumCol(null)
+      setSourceRow(null)
+      setSourceCol(null)
+
       if (row === 0 || col === 0) {
         console.log(`ROW or COL are either ZERO, so push ZERO`)
         // table[row].push(`ROW ${row} COL ${col}`)
@@ -114,6 +123,7 @@ const KnapsackDynamic = props => {
 
         const sumA = VALUES[row - 1]
         console.log(`NEW VAL SUM A ${sumA}`)
+        setAddendValueIndex(row - 1)
 
         const sumB = table[row - 1][col - WEIGHTS[row - 1]]
         console.log(`NEW VAL SUM B ${sumB}`)
@@ -179,32 +189,6 @@ const KnapsackDynamic = props => {
     return () => clearTimeout(timeout)
   }, [timer])
 
-  // Returns the maximum value that can
-  // be put in a knapsack of capacity maxWeight
-  // const knapsack = (maxWeight, weights, values, numItems, depth = 0) => {
-  //   let i, w
-  //   let table = new Array(numItems + 1)
-
-  //   // Build table table[][] in bottom up manner
-  //   for (i = 0; i <= numItems; i++) {
-  //     table[i] = new Array(maxWeight + 1)
-  //     for (w = 0; w <= maxWeight; w++) {
-  //       if (i === 0 || w === 0) table[i][w] = 0
-  //       else if (weights[i - 1] <= w)
-  //         table[i][w] = max(values[i - 1] + table[i - 1][w - weights[i - 1]], table[i - 1][w])
-  //       else table[i][w] = table[i - 1][w]
-  //     }
-  //   }
-
-  //   console.log(table)
-
-  //   return table[numItems][maxWeight]
-  // }
-
-  // console.log('STARTING HERE:')
-  // dump(MAX_WEIGHT, WEIGHTS, VALUES, VALUES.length, 0)
-
-  // console.log('RETURNING:')
   return (
     <div className={classes.root}>
       <div className={classes.info}>
@@ -212,57 +196,89 @@ const KnapsackDynamic = props => {
         <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
         <div>MAX WEIGHT: {MAX_WEIGHT}</div>
       </div>
-      {/* {knapsack(MAX_WEIGHT, WEIGHTS, VALUES, VALUES.length)} */}
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table" size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Number of Items</TableCell>
-              {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
-                return <TableCell key={colIndex}>{colIndex}</TableCell>
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {table.map((trow, rowIndex) => (
-              <TableRow
-                key={rowIndex}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                // className={classes.latest}
-              >
-                <TableCell component="th" scope="row" key={rowIndex}>
-                  {rowIndex}
-                </TableCell>
-                {trow.map((tcol, colIndex) => {
-                  // console.log(`ROW ${row} COL ${col} TROWi ${rowIndex} TCOLi ${colIndex}`)
-
-                  // console.log(
-                  //   `ROW ${row} SROW ${sourceRow} RI ${rowIndex} COL ${col} SCOL ${sourceCol} CI ${colIndex}`
-                  // )
-
-                  console.log(
-                    `ROW ${row} SROW ${sumRow} RI ${rowIndex} COL ${col} SCOL ${sumCol} CI ${colIndex}`
-                  )
-                  return (
-                    <TableCell
-                      key={colIndex}
-                      className={clsx(
-                        row === rowIndex && col === colIndex + 1 ? classes.latest : classes.empty,
-                        sourceRow === rowIndex && sourceCol === colIndex
-                          ? classes.source
-                          : classes.empty,
-                        sumRow === rowIndex && sumCol === colIndex ? classes.sum : classes.empty
-                      )}
-                    >
-                      {tcol}
+      <div>
+        <TableContainer component={Paper}>
+          <Table aria-label="info table" size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Weight</TableCell>
+                <TableCell>Value</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {VALUES.map((value, valueIndex) => {
+                return (
+                  <TableRow key={valueIndex}>
+                    <TableCell component="th" scope="row">
+                      {WEIGHTS[valueIndex]}
                     </TableCell>
-                  )
+                    <TableCell
+                      className={valueIndex === addendValueIndex ? classes.sum : classes.empty}
+                      component="th"
+                      scope="row"
+                    >
+                      {value}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+
+      <div>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="knapsack table" size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Number of Items</TableCell>
+                {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
+                  return <TableCell key={colIndex}>{colIndex}</TableCell>
                 })}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {table.map((trow, rowIndex) => (
+                <TableRow
+                  key={rowIndex}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  // className={classes.latest}
+                >
+                  <TableCell component="th" scope="row" key={rowIndex}>
+                    {rowIndex}
+                  </TableCell>
+                  {trow.map((tcol, colIndex) => {
+                    // console.log(`ROW ${row} COL ${col} TROWi ${rowIndex} TCOLi ${colIndex}`)
+
+                    // console.log(
+                    //   `ROW ${row} SROW ${sourceRow} RI ${rowIndex} COL ${col} SCOL ${sourceCol} CI ${colIndex}`
+                    // )
+
+                    // console.log(
+                    //   `ROW ${row} SROW ${sumRow} RI ${rowIndex} COL ${col} SCOL ${sumCol} CI ${colIndex}`
+                    // )
+                    return (
+                      <TableCell
+                        key={colIndex}
+                        className={clsx(
+                          row === rowIndex && col === colIndex + 1 ? classes.latest : classes.empty,
+                          sourceRow === rowIndex && sourceCol === colIndex
+                            ? classes.source
+                            : classes.empty,
+                          sumRow === rowIndex && sumCol === colIndex ? classes.sum : classes.empty
+                        )}
+                      >
+                        {tcol}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </div>
   )
 }
