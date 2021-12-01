@@ -15,15 +15,54 @@ const useStyles = makeStyles(
   theme => ({
     root: {
       display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
 
+    // Larger Areas
+    topArea: {
+      display: 'flex',
+      flex: 1,
+      backgroundColor: 'lightblue',
+    },
+
+    infoArea: {
+      display: 'flex',
+      flex: 1,
+      backgroundColor: 'lightgreen',
+      // flexDirection: 'column',
+    },
+
+    tableArea: {
+      display: 'flex',
+      flex: 1,
+      backgroundColor: 'lavender',
+    },
+
+    displayArea: {
+      display: 'flex',
+      flex: 1,
+      backgroundColor: 'yellow',
+      // width: '100%',
+      padding: theme.spacing(2),
+      margin: theme.spacing(2),
+    },
+
+    // Smaller Areas
     info: {
       display: 'flex',
       flexDirection: 'column',
     },
 
     table: {
+      display: 'flex',
+      flex: 1,
       margin: theme.spacing(1),
+    },
+
+    unit: {
+      display: 'flex',
+      flex: 1,
     },
 
     empty: {},
@@ -193,100 +232,135 @@ const KnapsackDynamic = props => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.info}>
-        <div>VALUES: {JSON.stringify(VALUES, null, 2)}</div>
-        <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
-        <div>MAX WEIGHT: {MAX_WEIGHT}</div>
+      <div className={classes.topArea}>
+        <div className={classes.info}>
+          <div>VALUES: {JSON.stringify(VALUES, null, 2)}</div>
+          <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
+          <div>MAX WEIGHT: {MAX_WEIGHT}</div>
+        </div>
       </div>
 
-      <div className={classes.table}>
-        <TableContainer component={Paper}>
-          <Table aria-label="info table" size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Weight</TableCell>
-                <TableCell>Value</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {VALUES.map((value, valueIndex) => {
-                return (
-                  <TableRow key={valueIndex}>
-                    <TableCell component="th" scope="row" align="center">
-                      {WEIGHTS[valueIndex]}
-                    </TableCell>
-                    <TableCell
-                      className={valueIndex === addendValueIndex ? classes.sum : classes.empty}
-                      component="th"
-                      scope="row"
-                      align="center"
-                    >
-                      {value}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-
-      <div className={classes.table}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="knapsack table" size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">Number of Items</TableCell>
-                {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
+      <div className={classes.infoArea}>
+        <div className={classes.table}>
+          <TableContainer component={Paper}>
+            <Table ar ia-label="info table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Weights</TableCell>
+                  <TableCell>Values</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {VALUES.map((value, valueIndex) => {
                   return (
-                    <TableCell key={colIndex} align="center">
-                      {colIndex}
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {table.map((trow, rowIndex) => (
-                <TableRow
-                  key={rowIndex}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  // className={classes.latest}
-                >
-                  <TableCell component="th" scope="row" key={rowIndex} align="center">
-                    {rowIndex}
-                  </TableCell>
-                  {trow.map((tcol, colIndex) => {
-                    // console.log(`ROW ${row} COL ${col} TROWi ${rowIndex} TCOLi ${colIndex}`)
-
-                    // console.log(
-                    //   `ROW ${row} SROW ${sourceRow} RI ${rowIndex} COL ${col} SCOL ${sourceCol} CI ${colIndex}`
-                    // )
-
-                    // console.log(
-                    //   `ROW ${row} SROW ${sumRow} RI ${rowIndex} COL ${col} SCOL ${sumCol} CI ${colIndex}`
-                    // )
-                    return (
+                    <TableRow key={valueIndex}>
+                      <TableCell component="th" scope="row" align="center">
+                        {WEIGHTS[valueIndex]}
+                      </TableCell>
                       <TableCell
-                        key={colIndex}
-                        className={clsx(
-                          row === rowIndex && col === colIndex + 1 ? classes.latest : classes.empty,
-                          sourceRow === rowIndex && sourceCol === colIndex
-                            ? classes.source
-                            : classes.empty,
-                          sumRow === rowIndex && sumCol === colIndex ? classes.sum : classes.empty
-                        )}
+                        className={valueIndex === addendValueIndex ? classes.sum : classes.empty}
+                        component="th"
+                        scope="row"
                         align="center"
                       >
-                        {tcol}
+                        {value}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+
+        <div className={classes.table}>
+          <TableContainer component={Paper}>
+            <Table ar ia-label="info table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Legend</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow key="hi">
+                  <TableCell component="th" scope="row" align="center">
+                    hi
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      </div>
+
+      <div className={classes.tableArea}>
+        <div className={classes.table}>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="knapsack table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">Number of Items</TableCell>
+                  {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
+                    return (
+                      <TableCell key={colIndex} align="center">
+                        {colIndex}
                       </TableCell>
                     )
                   })}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {table.map((trow, rowIndex) => (
+                  <TableRow
+                    key={rowIndex}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    // className={classes.latest}
+                  >
+                    <TableCell component="th" scope="row" key={rowIndex} align="center">
+                      {rowIndex}
+                    </TableCell>
+                    {trow.map((tcol, colIndex) => {
+                      // console.log(`ROW ${row} COL ${col} TROWi ${rowIndex} TCOLi ${colIndex}`)
+
+                      // console.log(
+                      //   `ROW ${row} SROW ${sourceRow} RI ${rowIndex} COL ${col} SCOL ${sourceCol} CI ${colIndex}`
+                      // )
+
+                      // console.log(
+                      //   `ROW ${row} SROW ${sumRow} RI ${rowIndex} COL ${col} SCOL ${sumCol} CI ${colIndex}`
+                      // )
+                      return (
+                        <TableCell
+                          key={colIndex}
+                          className={clsx(
+                            row === rowIndex && col === colIndex + 1
+                              ? classes.latest
+                              : classes.empty,
+                            sourceRow === rowIndex && sourceCol === colIndex
+                              ? classes.source
+                              : classes.empty,
+                            sumRow === rowIndex && sumCol === colIndex ? classes.sum : classes.empty
+                          )}
+                          align="center"
+                        >
+                          {tcol}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      </div>
+
+      <div className={classes.displayArea}>
+        <div className={classes.unit}>U</div>
+        <div className={classes.unit}>U</div>
+        <div className={classes.unit}>U</div>
+        <div className={classes.unit}>U</div>
+        <div className={classes.unit}>U</div>
       </div>
     </div>
   )

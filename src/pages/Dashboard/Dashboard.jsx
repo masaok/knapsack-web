@@ -35,6 +35,7 @@ const useStyles = makeStyles(
 
     content: {
       display: 'flex',
+      flex: 1,
       flexDirection: 'column',
     },
 
