@@ -31,12 +31,14 @@ const useStyles = makeStyles(
       flex: 1,
       backgroundColor: 'lightgreen',
       // flexDirection: 'column',
+      margin: theme.spacing(1),
     },
 
     tableArea: {
       display: 'flex',
       flex: 1,
       backgroundColor: 'lavender',
+      margin: theme.spacing(1),
     },
 
     displayArea: {
@@ -65,6 +67,7 @@ const useStyles = makeStyles(
       flex: 1,
     },
 
+    // Colors
     empty: {},
 
     latest: {
@@ -78,6 +81,12 @@ const useStyles = makeStyles(
     sum: {
       backgroundColor: 'lavender',
     },
+
+    // Legend
+    legendValue: {
+      fontWeight: 'bold',
+      whiteSpace: 'nowrap',
+    },
   }),
   { name: 'KnapsackDynamic' }
 )
@@ -88,15 +97,21 @@ const useStyles = makeStyles(
 // const MAX_WEIGHT = 2
 
 // Dev
-const VALUES = [6, 10, 12]
-const WEIGHTS = [1, 2, 3]
-const MAX_WEIGHT = 5
+// const VALUES = [6, 10, 12]
+// const WEIGHTS = [1, 2, 3]
+// const MAX_WEIGHT = 5
 
 // Geeks example
 // https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
 // const VALUES = [10, 15, 40]
 // const WEIGHTS = [1, 2, 3]
 // const MAX_WEIGHT = 6
+
+// Educative example (fruit)
+// https://www.educative.io/edpresso/what-is-the-knapsack-problem
+const VALUES = [4, 5, 3, 7]
+const WEIGHTS = [2, 3, 1, 4]
+const MAX_WEIGHT = 5
 
 const NUM_ITEMS = VALUES.length
 const MS = 1000
@@ -115,7 +130,15 @@ const tableDump = table => {
   console.log(JSON.stringify(table, null, 2))
 }
 
+// Initialize the Dynamic Table outside the component (because it's easier)
 const table = [[]]
+
+// Legend
+const legend = [
+  { className: 'latest', meaning: 'Latest Maximum Value Possible' },
+  { className: 'source', meaning: 'Previous Best Answer' },
+  { className: 'sum', meaning: 'Summed Answer' },
+]
 
 const KnapsackDynamic = props => {
   const classes = useStyles(props)
@@ -246,6 +269,37 @@ const KnapsackDynamic = props => {
             <Table ar ia-label="info table" size="small">
               <TableHead>
                 <TableRow>
+                  <TableCell>Legend</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {legend.map((item, index) => {
+                  const { className, meaning } = item
+                  return (
+                    <TableRow key={className}>
+                      <TableCell className={classes[className]} scope="row" align="center">
+                        <span className={classes.legendValue}>{meaning}</span>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      </div>
+
+      <div className={classes.tableArea}>
+        <div className={classes.table}>
+          <TableContainer component={Paper}>
+            <Table ar ia-label="info table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>&nbsp;</TableCell>
+                  <TableCell>&nbsp;</TableCell>
+                </TableRow>
+                <TableRow>
                   <TableCell>Weights</TableCell>
                   <TableCell>Values</TableCell>
                 </TableRow>
@@ -273,27 +327,6 @@ const KnapsackDynamic = props => {
           </TableContainer>
         </div>
 
-        <div className={classes.table}>
-          <TableContainer component={Paper}>
-            <Table ar ia-label="info table" size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Legend</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow key="hi">
-                  <TableCell component="th" scope="row" align="center">
-                    hi
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      </div>
-
-      <div className={classes.tableArea}>
         <div className={classes.table}>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="knapsack table" size="small">
