@@ -132,7 +132,7 @@ const WEIGHTS = [2, 3, 1, 4]
 const MAX_WEIGHT = 5
 
 const NUM_ITEMS = VALUES.length
-const MS = 1000
+const MS = 100
 
 const INIT_TABLE = [[]]
 
@@ -181,8 +181,8 @@ const KnapsackDynamic = props => {
   const [values, setValues] = useState(VALUES)
   const [maxWeight, setMaxWeight] = useState(MAX_WEIGHT)
 
-  const [maxRow] = useState(NUM_ITEMS)
-  const [maxCol] = useState(MAX_WEIGHT)
+  const [maxRow, setMaxRow] = useState(NUM_ITEMS)
+  const [maxCol, setMaxCol] = useState(MAX_WEIGHT)
 
   const [sourceRow, setSourceRow] = useState(null)
   const [sourceCol, setSourceCol] = useState(null)
@@ -191,6 +191,8 @@ const KnapsackDynamic = props => {
   const [sumCol, setSumCol] = useState(null)
 
   const [addendValueIndex, setAddendValueIndex] = useState(null)
+
+  const [ms, setMs] = useState(MS)
 
   // const [maxRow] = useState(1) // dev mode
   // const [maxCol] = useState(2) // dev mode
@@ -205,6 +207,7 @@ const KnapsackDynamic = props => {
   // }, [fields])
 
   const timer = useCallback(() => {
+    // If the current column is <= the max column (max weight)
     if (col <= maxCol) {
       console.log(`ROW ${row} COL ${col} (NEW COL)`)
       console.log(`CREATING NEW COL AT ROW ${row} AND COL ${col}`)
@@ -215,6 +218,11 @@ const KnapsackDynamic = props => {
       setSumCol(null)
       setSourceRow(null)
       setSourceCol(null)
+
+      console.log('TIMER CALLBACK:')
+      console.log(`WEIGHTS:` + JSON.stringify(weights, null, 2))
+      console.log(`VALUES:` + JSON.stringify(values, null, 2))
+      console.log(`MAX WEIGHT: ${maxWeight}`)
 
       if (row === 0 || col === 0) {
         console.log(`ROW or COL are either ZERO, so push ZERO`)
@@ -251,6 +259,7 @@ const KnapsackDynamic = props => {
         table[row].push(newMax)
         // tableDump(table)
       } else {
+        // Get the value from the previous row
         const prevRowVal = table[row - 1][col]
         console.log(`NO COMP, PREV ROW VAL ${prevRowVal}`)
         table[row].push(table[row - 1][col])
@@ -266,6 +275,7 @@ const KnapsackDynamic = props => {
 
       // console.log(table)
     } else if (row < maxRow) {
+      // else if the current row is < max row (# of values)
       console.log(`ROW ${row} COL ${col} (NEW ROW)`)
       // table[row] = new Array(MAX_WEIGHT + 1)
       // setTable(table => {
@@ -287,7 +297,7 @@ const KnapsackDynamic = props => {
   }, [maxCol, maxRow, seconds, row, col])
 
   useEffect(() => {
-    const timeout = setTimeout(timer, MS)
+    const timeout = setTimeout(timer, ms)
 
     // Make sure to clear the current timeout whenever a new timer is generated.
     // This ensures that only one timeout is active at a time.
@@ -317,6 +327,10 @@ const KnapsackDynamic = props => {
     setWeights([...fields.weights])
     setValues([...fields.values])
     setMaxWeight(fields.maxWeight)
+
+    // TODO: Fix this redundancy
+    setMaxCol(fields.maxWeight)
+    setMaxRow([...fields.values].length)
 
     setTable([[]])
     setRow(0)
@@ -409,6 +423,7 @@ const KnapsackDynamic = props => {
       </div>
 
       <div className={classes.tableArea}>
+        {/* Left Table List of Weights and Values */}
         <div className={classes.table}>
           <TableContainer component={Paper}>
             <Table size="small">
@@ -427,7 +442,7 @@ const KnapsackDynamic = props => {
                   return (
                     <TableRow key={valueIndex}>
                       <TableCell component="th" scope="row" align="center">
-                        {WEIGHTS[valueIndex]}
+                        {weights[valueIndex]}
                       </TableCell>
                       <TableCell
                         className={valueIndex === addendValueIndex ? classes.sum : classes.empty}
@@ -445,13 +460,14 @@ const KnapsackDynamic = props => {
           </TableContainer>
         </div>
 
+        {/* Main Table Output */}
         <div className={classes.table}>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="knapsack table" size="small">
               <TableHead>
                 <TableRow>
                   <TableCell align="center">Number of Items</TableCell>
-                  {[...Array(MAX_WEIGHT + 1).keys()].map((col, colIndex) => {
+                  {[...Array(maxWeight + 1).keys()].map((col, colIndex) => {
                     return (
                       <TableCell key={colIndex} align="center">
                         {colIndex}
