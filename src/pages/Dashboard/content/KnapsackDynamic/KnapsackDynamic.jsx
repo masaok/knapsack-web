@@ -11,6 +11,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+
 const useStyles = makeStyles(
   theme => ({
     root: {
@@ -22,6 +25,7 @@ const useStyles = makeStyles(
     // Larger Areas
     topArea: {
       display: 'flex',
+      flexDirection: 'column',
       flex: 1,
       backgroundColor: 'lightblue',
     },
@@ -87,6 +91,20 @@ const useStyles = makeStyles(
       fontWeight: 'bold',
       whiteSpace: 'nowrap',
     },
+
+    // Fields
+    inputs: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    fields: {
+      margin: theme.spacing(1),
+    },
+
+    updateButton: {
+      justifyContent: 'center',
+    },
   }),
   { name: 'KnapsackDynamic' }
 )
@@ -116,6 +134,8 @@ const MAX_WEIGHT = 5
 const NUM_ITEMS = VALUES.length
 const MS = 1000
 
+const INIT_TABLE = [[]]
+
 /* A Naive recursive implementation of 0-1 Knapsack problem
  * Credit: https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
  */
@@ -126,12 +146,12 @@ const max = (a, b) => {
   return a > b ? a : b
 }
 
-const tableDump = table => {
-  console.log(JSON.stringify(table, null, 2))
-}
+// const tableDump = table => {
+//   console.log(JSON.stringify(table, null, 2))
+// }
 
 // Initialize the Dynamic Table outside the component (because it's easier)
-const table = [[]]
+// const table = [[]]
 
 // Legend
 const legend = [
@@ -143,9 +163,23 @@ const legend = [
 const KnapsackDynamic = props => {
   const classes = useStyles(props)
 
+  const [table, setTable] = useState([[]])
+
   const [seconds, setSeconds] = useState(0)
   const [row, setRow] = useState(0)
   const [col, setCol] = useState(0)
+
+  // Fields to eventually be used in display
+  const [fields, setFields] = useState({
+    weights: WEIGHTS,
+    values: VALUES,
+    maxWeight: MAX_WEIGHT,
+  })
+
+  // Fields in use for display
+  const [weights, setWeights] = useState(WEIGHTS)
+  const [values, setValues] = useState(VALUES)
+  const [maxWeight, setMaxWeight] = useState(MAX_WEIGHT)
 
   const [maxRow] = useState(NUM_ITEMS)
   const [maxCol] = useState(MAX_WEIGHT)
@@ -163,6 +197,13 @@ const KnapsackDynamic = props => {
 
   // const [table, setTable] = useState(new Array(NUM_ITEMS + 1))
 
+  // useEffect(() => {
+  //   console.log(fields)
+  //   setWeights([...fields.weights])
+  //   setValues([...fields.values])
+  //   setMaxWeight(fields.maxWeight)
+  // }, [fields])
+
   const timer = useCallback(() => {
     if (col <= maxCol) {
       console.log(`ROW ${row} COL ${col} (NEW COL)`)
@@ -179,22 +220,22 @@ const KnapsackDynamic = props => {
         console.log(`ROW or COL are either ZERO, so push ZERO`)
         // table[row].push(`ROW ${row} COL ${col}`)
         table[row].push(0)
-      } else if (WEIGHTS[row - 1] <= col) {
+      } else if (weights[row - 1] <= col) {
         console.log(`PREV ROW WEIGHT <= COL ${col}`)
 
         console.log('VALUES:')
-        console.log(JSON.stringify(VALUES, null, 2))
+        console.log(JSON.stringify(values, null, 2))
 
-        const sumA = VALUES[row - 1]
+        const sumA = values[row - 1]
         console.log(`NEW VAL SUM A ${sumA}`)
         setAddendValueIndex(row - 1)
 
-        const sumB = table[row - 1][col - WEIGHTS[row - 1]]
+        const sumB = table[row - 1][col - weights[row - 1]]
         console.log(`NEW VAL SUM B ${sumB}`)
         setSumRow(row - 1)
-        setSumCol(col - WEIGHTS[row - 1])
+        setSumCol(col - weights[row - 1])
 
-        const newVal = VALUES[row - 1] + table[row - 1][col - WEIGHTS[row - 1]]
+        const newVal = values[row - 1] + table[row - 1][col - weights[row - 1]]
         console.log(`NEW VAL ${newVal}`)
 
         const prevRowVal = table[row - 1][col]
@@ -203,12 +244,12 @@ const KnapsackDynamic = props => {
         setSourceCol(col)
 
         const newMax = max(
-          VALUES[row - 1] + table[row - 1][col - WEIGHTS[row - 1]],
+          values[row - 1] + table[row - 1][col - weights[row - 1]],
           table[row - 1][col]
         )
         console.log(`NEW MAX ${newMax}`)
         table[row].push(newMax)
-        tableDump(table)
+        // tableDump(table)
       } else {
         const prevRowVal = table[row - 1][col]
         console.log(`NO COMP, PREV ROW VAL ${prevRowVal}`)
@@ -217,7 +258,7 @@ const KnapsackDynamic = props => {
         setSourceRow(row - 1)
         setSourceCol(col)
 
-        tableDump(table)
+        // tableDump(table)
       }
 
       setCol(col + 1)
@@ -234,7 +275,7 @@ const KnapsackDynamic = props => {
 
       console.log(`CREATING NEW ROW AT ${row}`)
       table.push([])
-      tableDump(table)
+      // tableDump(table)
       setRow(row + 1)
       setCol(0)
       setSeconds(seconds + 1)
@@ -253,20 +294,97 @@ const KnapsackDynamic = props => {
     return () => clearTimeout(timeout)
   }, [timer])
 
+  const handleFieldChange = event => {
+    console.log(event.target.name)
+    console.log(event.target.value)
+
+    // const newFields = { ...fields }
+
+    switch (event.target.name) {
+      case 'weights':
+      case 'values':
+        setFields({ ...fields, [event.target.name]: event.target.value.split(',') })
+        break
+      case 'maxWeight':
+        setFields({ ...fields, [event.target.name]: parseInt(event.target.value) })
+        break
+      default:
+        setFields({ ...fields, [event.target.name]: event.target.value })
+    }
+  }
+
+  const handleUpdate = () => {
+    setWeights([...fields.weights])
+    setValues([...fields.values])
+    setMaxWeight(fields.maxWeight)
+
+    setTable([[]])
+    setRow(0)
+    setCol(0)
+    setSeconds(0)
+
+    // setAddendValueIndex(null)
+    // setSumRow(null)
+    // setSumCol(null)
+    // setSourceRow(null)
+    // setSourceCol(null)
+  }
+
+  // console.log('FIELDS:')
+  // console.log(fields)
+
+  console.log('TABLE:')
+  console.log(table)
+
   return (
     <div className={classes.root}>
       <div className={classes.topArea}>
         <div className={classes.info}>
-          <div>VALUES: {JSON.stringify(VALUES, null, 2)}</div>
-          <div>WEIGHTS: {JSON.stringify(WEIGHTS, null, 2)}</div>
-          <div>MAX WEIGHT: {MAX_WEIGHT}</div>
+          <div>VALUES: {JSON.stringify(values, null, 2)}</div>
+          <div>WEIGHTS: {JSON.stringify(weights, null, 2)}</div>
+          <div>MAX WEIGHT: {maxWeight}</div>
+        </div>
+
+        <div className={classes.inputs}>
+          <div className={classes.fields}>
+            <TextField
+              name="weights"
+              label="Weights"
+              size="small"
+              value={fields.weights?.join(',')}
+              onChange={handleFieldChange}
+            />
+          </div>
+          <div className={classes.fields}>
+            <TextField
+              name="values"
+              label="Values"
+              size="small"
+              value={fields.values.join(',')}
+              onChange={handleFieldChange}
+            />
+          </div>
+          <div className={classes.fields}>
+            <TextField
+              name="maxWeight"
+              label="Max Weight"
+              size="small"
+              value={fields.maxWeight}
+              onChange={handleFieldChange}
+            />
+          </div>
+          <div className={clsx(classes.fields, classes.updateButton)}>
+            <Button variant="contained" onClick={handleUpdate}>
+              Update
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className={classes.infoArea}>
         <div className={classes.table}>
           <TableContainer component={Paper}>
-            <Table ar ia-label="info table" size="small">
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>Legend</TableCell>
@@ -293,7 +411,7 @@ const KnapsackDynamic = props => {
       <div className={classes.tableArea}>
         <div className={classes.table}>
           <TableContainer component={Paper}>
-            <Table ar ia-label="info table" size="small">
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>&nbsp;</TableCell>
@@ -305,7 +423,7 @@ const KnapsackDynamic = props => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {VALUES.map((value, valueIndex) => {
+                {values.map((value, valueIndex) => {
                   return (
                     <TableRow key={valueIndex}>
                       <TableCell component="th" scope="row" align="center">
@@ -388,13 +506,13 @@ const KnapsackDynamic = props => {
         </div>
       </div>
 
-      <div className={classes.displayArea}>
+      {/* <div className={classes.displayArea}>
         <div className={classes.unit}>U</div>
         <div className={classes.unit}>U</div>
         <div className={classes.unit}>U</div>
         <div className={classes.unit}>U</div>
         <div className={classes.unit}>U</div>
-      </div>
+      </div> */}
     </div>
   )
 }
