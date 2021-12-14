@@ -117,6 +117,10 @@ const useStyles = makeStyles(
     errors: {
       backgroundColor: 'red',
     },
+
+    error: {
+      color: 'red',
+    },
   }),
   { name: 'KnapsackDynamic' }
 )
@@ -184,17 +188,11 @@ const KnapsackDynamic = props => {
   const [row, setRow] = useState(0)
   const [col, setCol] = useState(0)
 
-  // Fields to eventually be used in display
-  const [fields, setFields] = useState({
-    weights: WEIGHTS,
-    values: VALUES,
-    maxWeight: MAX_WEIGHT,
-  })
-
   // Fields as typed in raw string form (before validation)
   const [weightsInput, setWeightsInput] = useState(WEIGHTS.join(','))
   const [valuesInput, setValuesInput] = useState(VALUES.join(','))
   const [maxWeightInput, setMaxWeightInput] = useState(MAX_WEIGHT)
+  const [msInput, setMsInput] = useState(MS)
 
   // Fields used in algorithm
   const [weights, setWeights] = useState(WEIGHTS)
@@ -212,7 +210,7 @@ const KnapsackDynamic = props => {
 
   const [addendValueIndex, setAddendValueIndex] = useState(null)
 
-  const [ms] = useState(MS)
+  const [ms, setMs] = useState(MS)
 
   const [errors, setErrors] = useState([])
 
@@ -224,19 +222,35 @@ const KnapsackDynamic = props => {
   // Validation Effect
   useEffect(() => {
     const newErrors = []
-    const newWeights = weightsInput.split(',').map(Number)
-    const newValues = valuesInput.split(',').map(Number)
+    const newWeights = weightsInput.split(',')
+    const newValues = valuesInput.split(',')
 
     if (newWeights.length !== newValues.length) {
       newErrors.push('Number of weights and values must be equal.')
     }
 
+    newValues.forEach(item => {
+      if (isNaN(item)) {
+        newErrors.push(`Value "${item}" is not a number`)
+      }
+    })
+
+    newWeights.forEach(item => {
+      if (isNaN(item)) {
+        newErrors.push(`Weight "${item}" is not a number`)
+      }
+    })
+
     if (isNaN(maxWeightInput)) {
       newErrors.push('Max weight invalid.')
     }
 
+    if (isNaN(msInput)) {
+      newErrors.push('Milliseconds invalid.')
+    }
+
     setErrors([...newErrors])
-  }, [weightsInput, valuesInput, maxWeightInput])
+  }, [weightsInput, valuesInput, maxWeightInput, msInput])
 
   const timer = useCallback(() => {
     // If the current column is <= the max column (max weight)
@@ -348,22 +362,18 @@ const KnapsackDynamic = props => {
         break
       case 'values':
         setValuesInput(event.target.value)
-        // setFields({ ...fields, [event.target.name]: event.target.value.split(',').map(Number) })
         break
       case 'maxWeight':
-        // setFields({ ...fields, [event.target.name]: parseInt(event.target.value) })
         setMaxWeightInput(event.target.value)
         break
+      case 'ms':
+        setMsInput(event.target.value)
+        break
       default:
-        setFields({ ...fields, [event.target.name]: event.target.value })
     }
   }
 
   const handleUpdate = () => {
-    // setWeights([...fields.weights])
-    // setValues([...fields.values])
-    // setMaxWeight(fields.maxWeight)
-
     if (errors.length === 0) {
       const newWeights = weightsInput.split(',').map(Number)
       const newValues = valuesInput.split(',').map(Number)
@@ -371,6 +381,7 @@ const KnapsackDynamic = props => {
       setWeights([...newWeights])
       setValues([...newValues])
       setMaxWeight(parseInt(maxWeightInput))
+      setMs(parseInt(msInput))
 
       // TODO: Fix this redundancy
       setMaxCol(parseInt(maxWeightInput))
@@ -423,6 +434,15 @@ const KnapsackDynamic = props => {
               onChange={handleFieldChange}
             />
           </div>
+          <div className={classes.fields}>
+            <TextField
+              name="ms"
+              label="Milliseconds per tick"
+              size="small"
+              value={msInput}
+              onChange={handleFieldChange}
+            />
+          </div>
           <div className={clsx(classes.fields, classes.updateButton)}>
             <Button variant="contained" onClick={handleUpdate} disabled={errors.length > 0}>
               Update
@@ -431,7 +451,7 @@ const KnapsackDynamic = props => {
         </div>
       </div>
 
-      <Paper
+      <div
         // className={classes.errors}
         classes={{
           root: classes.errors,
@@ -443,9 +463,9 @@ const KnapsackDynamic = props => {
         // }}
       >
         {errors.map(item => {
-          return <div>{item}</div>
+          return <div className={classes.error}>{item}</div>
         })}
-      </Paper>
+      </div>
 
       <div className={classes.infoArea}>
         <div className={classes.table}>
