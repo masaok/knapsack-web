@@ -3,6 +3,11 @@ import { makeStyles } from '@mui/styles'
 
 import clsx from 'clsx'
 
+import Button from '@mui/material/Button'
+import Link from '@mui/material/Link'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -10,9 +15,6 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
 
 const useStyles = makeStyles(
   theme => ({
@@ -121,6 +123,11 @@ const useStyles = makeStyles(
     error: {
       color: 'red',
     },
+
+    // Footer
+    footer: {
+      marginTop: theme.spacing(1),
+    },
   }),
   { name: 'KnapsackDynamic' }
 )
@@ -155,10 +162,6 @@ const MAX_WEIGHT = 6
 const NUM_ITEMS = VALUES.length
 const MS = 100
 
-/* A Naive recursive implementation of 0-1 Knapsack problem
- * Credit: https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
- */
-
 // A utility function that returns
 // maximum of two integers
 const max = (a, b) => {
@@ -168,9 +171,6 @@ const max = (a, b) => {
 // const tableDump = table => {
 //   console.log(JSON.stringify(table, null, 2))
 // }
-
-// Initialize the Dynamic Table outside the component (because it's easier)
-// const table = [[]]
 
 // Legend
 const legend = [
@@ -214,11 +214,6 @@ const KnapsackDynamic = props => {
 
   const [errors, setErrors] = useState([])
 
-  // const [maxRow] = useState(1) // dev mode
-  // const [maxCol] = useState(2) // dev mode
-
-  // const [table, setTable] = useState(new Array(NUM_ITEMS + 1))
-
   // Validation Effect
   useEffect(() => {
     const newErrors = []
@@ -255,8 +250,8 @@ const KnapsackDynamic = props => {
   const timer = useCallback(() => {
     // If the current column is <= the max column (max weight)
     if (col <= maxCol) {
-      console.log(`ROW ${row} COL ${col} (NEW COL)`)
-      console.log(`CREATING NEW COL AT ROW ${row} AND COL ${col}`)
+      // console.log(`ROW ${row} COL ${col} (NEW COL)`)
+      // console.log(`CREATING NEW COL AT ROW ${row} AND COL ${col}`)
 
       // Reset all highlights
       setAddendValueIndex(null)
@@ -265,50 +260,53 @@ const KnapsackDynamic = props => {
       setSourceRow(null)
       setSourceCol(null)
 
-      console.log('TIMER CALLBACK:')
-      console.log(`WEIGHTS:` + JSON.stringify(weights, null, 2))
-      console.log(`VALUES:` + JSON.stringify(values, null, 2))
-      console.log(`MAX WEIGHT: ${maxWeight}`)
+      // console.log('TIMER CALLBACK:')
+      // console.log(`WEIGHTS:` + JSON.stringify(weights, null, 2))
+      // console.log(`VALUES:` + JSON.stringify(values, null, 2))
+      // console.log(`MAX WEIGHT: ${maxWeight}`)
 
       if (row === 0 || col === 0) {
-        console.log(`ROW or COL are either ZERO, so push ZERO`)
+        // console.log(`ROW or COL are either ZERO, so push ZERO`)
         // table[row].push(`ROW ${row} COL ${col}`)
         table[row].push(0)
       } else if (weights[row - 1] <= col) {
-        console.log(`PREV ROW WEIGHT <= COL ${col}`)
+        // console.log(`PREV ROW WEIGHT <= COL ${col}`)
 
-        console.log('VALUES:')
-        console.log(JSON.stringify(values, null, 2))
+        // console.log('VALUES:')
+        // console.log(JSON.stringify(values, null, 2))
 
         const sumA = values[row - 1]
-        console.log(`NEW VAL SUM A ${sumA}`)
+        // console.log(`NEW VAL SUM A ${sumA}`)
         setAddendValueIndex(row - 1)
 
         const sumB = table[row - 1][col - weights[row - 1]]
-        console.log(`NEW VAL SUM B ${sumB}`)
+        // console.log(`NEW VAL SUM B ${sumB}`)
         setSumRow(row - 1)
         setSumCol(col - weights[row - 1])
 
-        const newVal = values[row - 1] + table[row - 1][col - weights[row - 1]]
-        console.log(`NEW VAL ${newVal}`)
+        // const newVal = values[row - 1] + table[row - 1][col - weights[row - 1]]
+        const newVal = sumA + sumB
+        // console.log(`NEW VAL ${newVal}`)
 
         const prevRowVal = table[row - 1][col]
-        console.log(`PREV ROW VAL ${prevRowVal}`)
+        // console.log(`PREV ROW VAL ${prevRowVal}`)
         setSourceRow(row - 1)
         setSourceCol(col)
 
         const newMax = max(
-          values[row - 1] + table[row - 1][col - weights[row - 1]],
-          table[row - 1][col]
+          // values[row - 1] + table[row - 1][col - weights[row - 1]],
+          newVal,
+          // table[row - 1][col]
+          prevRowVal
         )
-        console.log(`NEW MAX ${newMax}`)
+        // console.log(`NEW MAX ${newMax}`)
         table[row].push(newMax)
         // tableDump(table)
       } else {
         // Get the value from the previous row
         const prevRowVal = table[row - 1][col]
-        console.log(`NO COMP, PREV ROW VAL ${prevRowVal}`)
-        table[row].push(table[row - 1][col])
+        // console.log(`NO COMP, PREV ROW VAL ${prevRowVal}`)
+        table[row].push(prevRowVal)
 
         setSourceRow(row - 1)
         setSourceCol(col)
@@ -321,15 +319,8 @@ const KnapsackDynamic = props => {
 
       // console.log(table)
     } else if (row < maxRow) {
-      // else if the current row is < max row (# of values)
-      console.log(`ROW ${row} COL ${col} (NEW ROW)`)
-      // table[row] = new Array(MAX_WEIGHT + 1)
-      // setTable(table => {
-      //   table[row] = new Array(MAX_WEIGHT + 1)
-      //   return table
-      // })
-
-      console.log(`CREATING NEW ROW AT ${row}`)
+      // console.log(`ROW ${row} COL ${col} (NEW ROW)`)
+      // console.log(`CREATING NEW ROW AT ${row}`)
       table.push([])
       // tableDump(table)
       setRow(row + 1)
@@ -340,7 +331,7 @@ const KnapsackDynamic = props => {
     // If neither condition is true, the state doesn't change, which doesn't
     // recreate the timer, which doesn't trigger the useEffect. The loop
     // will stop.
-  }, [maxCol, maxRow, ticks, row, col, maxWeight, table, values, weights])
+  }, [maxCol, maxRow, ticks, row, col, table, values, weights])
 
   useEffect(() => {
     const timeout = setTimeout(timer, ms)
@@ -353,8 +344,6 @@ const KnapsackDynamic = props => {
   const handleFieldChange = event => {
     console.log(event.target.name)
     console.log(event.target.value)
-
-    // const newFields = { ...fields }
 
     switch (event.target.name) {
       case 'weights':
@@ -398,8 +387,8 @@ const KnapsackDynamic = props => {
   // console.log('FIELDS:')
   // console.log(fields)
 
-  console.log('TABLE:')
-  console.log(table)
+  // console.log('TABLE:')
+  // console.log(table)
 
   return (
     <div className={classes.root}>
@@ -410,7 +399,6 @@ const KnapsackDynamic = props => {
               name="weights"
               label="Weights"
               size="small"
-              // value={fields.weights.join(',')}
               value={weightsInput}
               onChange={handleFieldChange}
             />
@@ -420,7 +408,6 @@ const KnapsackDynamic = props => {
               name="values"
               label="Values"
               size="small"
-              // value={fields.values.join(',')}
               value={valuesInput}
               onChange={handleFieldChange}
             />
@@ -568,7 +555,6 @@ const KnapsackDynamic = props => {
             </Table>
           </TableContainer>
         </div>
-
         {/* Main Table Output */}
         <div className={classes.table}>
           <TableContainer component={Paper}>
@@ -631,13 +617,14 @@ const KnapsackDynamic = props => {
         </div>
       </div>
 
-      {/* <div className={classes.displayArea}>
-        <div className={classes.unit}>U</div>
-        <div className={classes.unit}>U</div>
-        <div className={classes.unit}>U</div>
-        <div className={classes.unit}>U</div>
-        <div className={classes.unit}>U</div>
-      </div> */}
+      <footer className={classes.footer}>
+        <Typography>
+          Dynamic Algorithm Credit:&nbsp;
+          <Link href="https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/" target="_blank">
+            https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
+          </Link>
+        </Typography>
+      </footer>
     </div>
   )
 }
