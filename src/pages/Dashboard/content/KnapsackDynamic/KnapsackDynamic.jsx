@@ -27,7 +27,7 @@ const useStyles = makeStyles(
       display: 'flex',
       flexDirection: 'column',
       flex: 1,
-      backgroundColor: 'lightblue',
+      // backgroundColor: 'lightblue',
     },
 
     infoArea: {
@@ -87,6 +87,10 @@ const useStyles = makeStyles(
     },
 
     // Legend
+    legendHeader: {
+      fontWeight: 'bold',
+    },
+
     legendValue: {
       fontWeight: 'bold',
       whiteSpace: 'nowrap',
@@ -94,6 +98,9 @@ const useStyles = makeStyles(
 
     // Fields
     inputs: {
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -105,6 +112,11 @@ const useStyles = makeStyles(
     updateButton: {
       justifyContent: 'center',
     },
+
+    // Errors
+    errors: {
+      backgroundColor: 'red',
+    },
   }),
   { name: 'KnapsackDynamic' }
 )
@@ -114,10 +126,15 @@ const useStyles = makeStyles(
 // const MAX_WEIGHT = 50
 // const MAX_WEIGHT = 2
 
+// Minimal
+const VALUES = [6, 10]
+const WEIGHTS = [1, 2]
+const MAX_WEIGHT = 1
+
 // Dev
 // const VALUES = [6, 10, 12]
 // const WEIGHTS = [1, 2, 3]
-// const MAX_WEIGHT = 5
+// const MAX_WEIGHT = 2
 
 // Geeks example
 // https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
@@ -127,9 +144,9 @@ const useStyles = makeStyles(
 
 // Educative example (fruit)
 // https://www.educative.io/edpresso/what-is-the-knapsack-problem
-const VALUES = [4, 5, 3, 7]
-const WEIGHTS = [2, 3, 1, 4]
-const MAX_WEIGHT = 5
+// const VALUES = [4, 5, 3, 7]
+// const WEIGHTS = [2, 3, 1, 4]
+// const MAX_WEIGHT = 5
 
 const NUM_ITEMS = VALUES.length
 const MS = 100
@@ -163,7 +180,7 @@ const KnapsackDynamic = props => {
 
   const [table, setTable] = useState([[]])
 
-  const [seconds, setSeconds] = useState(0)
+  const [ticks, setTicks] = useState(0)
   const [row, setRow] = useState(0)
   const [col, setCol] = useState(0)
 
@@ -174,7 +191,12 @@ const KnapsackDynamic = props => {
     maxWeight: MAX_WEIGHT,
   })
 
-  // Fields in use for display
+  // Fields as typed in raw string form (before validation)
+  const [weightsInput, setWeightsInput] = useState(WEIGHTS.join(','))
+  const [valuesInput, setValuesInput] = useState(VALUES.join(','))
+  const [maxWeightInput, setMaxWeightInput] = useState(MAX_WEIGHT)
+
+  // Fields used in algorithm
   const [weights, setWeights] = useState(WEIGHTS)
   const [values, setValues] = useState(VALUES)
   const [maxWeight, setMaxWeight] = useState(MAX_WEIGHT)
@@ -192,17 +214,29 @@ const KnapsackDynamic = props => {
 
   const [ms] = useState(MS)
 
+  const [errors, setErrors] = useState([])
+
   // const [maxRow] = useState(1) // dev mode
   // const [maxCol] = useState(2) // dev mode
 
   // const [table, setTable] = useState(new Array(NUM_ITEMS + 1))
 
-  // useEffect(() => {
-  //   console.log(fields)
-  //   setWeights([...fields.weights])
-  //   setValues([...fields.values])
-  //   setMaxWeight(fields.maxWeight)
-  // }, [fields])
+  // Validation Effect
+  useEffect(() => {
+    const newErrors = []
+    const newWeights = weightsInput.split(',').map(Number)
+    const newValues = valuesInput.split(',').map(Number)
+
+    if (newWeights.length !== newValues.length) {
+      newErrors.push('Number of weights and values must be equal.')
+    }
+
+    if (isNaN(maxWeightInput)) {
+      newErrors.push('Max weight invalid.')
+    }
+
+    setErrors([...newErrors])
+  }, [weightsInput, valuesInput, maxWeightInput])
 
   const timer = useCallback(() => {
     // If the current column is <= the max column (max weight)
@@ -269,7 +303,7 @@ const KnapsackDynamic = props => {
       }
 
       setCol(col + 1)
-      setSeconds(seconds + 1)
+      setTicks(ticks + 1)
 
       // console.log(table)
     } else if (row < maxRow) {
@@ -286,13 +320,13 @@ const KnapsackDynamic = props => {
       // tableDump(table)
       setRow(row + 1)
       setCol(0)
-      setSeconds(seconds + 1)
+      setTicks(ticks + 1)
     }
 
     // If neither condition is true, the state doesn't change, which doesn't
     // recreate the timer, which doesn't trigger the useEffect. The loop
     // will stop.
-  }, [maxCol, maxRow, seconds, row, col, maxWeight, table, values, weights])
+  }, [maxCol, maxRow, ticks, row, col, maxWeight, table, values, weights])
 
   useEffect(() => {
     const timeout = setTimeout(timer, ms)
@@ -310,11 +344,15 @@ const KnapsackDynamic = props => {
 
     switch (event.target.name) {
       case 'weights':
+        setWeightsInput(event.target.value)
+        break
       case 'values':
-        setFields({ ...fields, [event.target.name]: event.target.value.split(',').map(Number) })
+        setValuesInput(event.target.value)
+        // setFields({ ...fields, [event.target.name]: event.target.value.split(',').map(Number) })
         break
       case 'maxWeight':
-        setFields({ ...fields, [event.target.name]: parseInt(event.target.value) })
+        // setFields({ ...fields, [event.target.name]: parseInt(event.target.value) })
+        setMaxWeightInput(event.target.value)
         break
       default:
         setFields({ ...fields, [event.target.name]: event.target.value })
@@ -322,24 +360,28 @@ const KnapsackDynamic = props => {
   }
 
   const handleUpdate = () => {
-    setWeights([...fields.weights])
-    setValues([...fields.values])
-    setMaxWeight(fields.maxWeight)
+    // setWeights([...fields.weights])
+    // setValues([...fields.values])
+    // setMaxWeight(fields.maxWeight)
 
-    // TODO: Fix this redundancy
-    setMaxCol(fields.maxWeight)
-    setMaxRow([...fields.values].length)
+    if (errors.length === 0) {
+      const newWeights = weightsInput.split(',').map(Number)
+      const newValues = valuesInput.split(',').map(Number)
 
-    setTable([[]])
-    setRow(0)
-    setCol(0)
-    setSeconds(0)
+      setWeights([...newWeights])
+      setValues([...newValues])
+      setMaxWeight(parseInt(maxWeightInput))
 
-    // setAddendValueIndex(null)
-    // setSumRow(null)
-    // setSumCol(null)
-    // setSourceRow(null)
-    // setSourceCol(null)
+      // TODO: Fix this redundancy
+      setMaxCol(parseInt(maxWeightInput))
+      setMaxRow(newValues.length)
+
+      // Reset the animation
+      setTable([[]])
+      setRow(0)
+      setCol(0)
+      setTicks(0)
+    }
   }
 
   // console.log('FIELDS:')
@@ -351,19 +393,14 @@ const KnapsackDynamic = props => {
   return (
     <div className={classes.root}>
       <div className={classes.topArea}>
-        <div className={classes.info}>
-          <div>VALUES: {JSON.stringify(values, null, 2)}</div>
-          <div>WEIGHTS: {JSON.stringify(weights, null, 2)}</div>
-          <div>MAX WEIGHT: {maxWeight}</div>
-        </div>
-
         <div className={classes.inputs}>
           <div className={classes.fields}>
             <TextField
               name="weights"
               label="Weights"
               size="small"
-              value={fields.weights.join(',')}
+              // value={fields.weights.join(',')}
+              value={weightsInput}
               onChange={handleFieldChange}
             />
           </div>
@@ -372,7 +409,8 @@ const KnapsackDynamic = props => {
               name="values"
               label="Values"
               size="small"
-              value={fields.values.join(',')}
+              // value={fields.values.join(',')}
+              value={valuesInput}
               onChange={handleFieldChange}
             />
           </div>
@@ -381,25 +419,78 @@ const KnapsackDynamic = props => {
               name="maxWeight"
               label="Max Weight"
               size="small"
-              value={fields.maxWeight}
+              value={maxWeightInput}
               onChange={handleFieldChange}
             />
           </div>
           <div className={clsx(classes.fields, classes.updateButton)}>
-            <Button variant="contained" onClick={handleUpdate}>
+            <Button variant="contained" onClick={handleUpdate} disabled={errors.length > 0}>
               Update
             </Button>
           </div>
         </div>
       </div>
 
+      <Paper
+        // className={classes.errors}
+        classes={{
+          root: classes.errors,
+          rounded: classes.errors,
+          outline: classes.errors,
+        }}
+        // style={{
+        //   backgroundColor: 'blue',
+        // }}
+      >
+        {errors.map(item => {
+          return <div>{item}</div>
+        })}
+      </Paper>
+
       <div className={classes.infoArea}>
+        <div className={classes.table}>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell scope="row" align="center">
+                    Ticks
+                  </TableCell>
+                  <TableCell scope="row" align="center">
+                    {ticks}
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell scope="row" align="center">
+                    Milliseconds per tick
+                  </TableCell>
+                  <TableCell scope="row" align="center">
+                    {ms}
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell scope="row" align="center">
+                    Max Weight
+                  </TableCell>
+                  <TableCell scope="row" align="center">
+                    {maxWeight}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+
         <div className={classes.table}>
           <TableContainer component={Paper}>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Legend</TableCell>
+                  <TableCell align="center">
+                    <span className={classes.legendHeader}>Color Legend</span>
+                  </TableCell>
                 </TableRow>
               </TableHead>
 
@@ -407,7 +498,7 @@ const KnapsackDynamic = props => {
                 {legend.map((item, index) => {
                   const { className, meaning } = item
                   return (
-                    <TableRow key={className}>
+                    <TableRow key={index}>
                       <TableCell className={classes[className]} scope="row" align="center">
                         <span className={classes.legendValue}>{meaning}</span>
                       </TableCell>

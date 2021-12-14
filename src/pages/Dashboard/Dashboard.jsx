@@ -3,25 +3,35 @@ import { makeStyles } from '@mui/styles'
 
 import { Helmet } from 'react-helmet-async'
 
+import Typography from '@mui/material/Typography'
+
 import KnapsackDynamic from './content/KnapsackDynamic/KnapsackDynamic'
-// import KnapsackRecursion from './content/KnapsackRecursion/KnapsackRecursion'
 
 import { Routes, Route } from 'react-router-dom'
-
-// import logoTrans from '../../assets/images/placeholder-logo.png'
 
 const useStyles = makeStyles(
   theme => ({
     root: {
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: 'pink',
+      backgroundColor: 'white',
       height: '100vh',
     },
 
     header: {
       display: 'flex',
       justifyContent: 'center',
+      marginTop: theme.spacing(3),
+      marginBottom: theme.spacing(3),
+    },
+
+    pageTitle: {
+      color: 'white',
+      fontSize: 40,
+      fontFamily: ['Carter One', 'sans-serif'].join(','),
+      textShadow: '3px 3px 4px #000',
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
     },
 
     body: {
@@ -63,12 +73,16 @@ const Dashboard = props => {
     <div className={classes.root}>
       <Helmet>
         <title>Knapsack Visualizer</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
+          rel="stylesheet"
+        ></link>
       </Helmet>
       <div className={classes.header}>
-        {/* <div className={classes.logoContainer}>
-          <img className={classes.logo} src={logoTrans} alt="knapsack visualizer logo" />
-        </div> */}
-        Knapsack Visualizer
+        <Typography variant="h2" className={classes.pageTitle}>
+          Knapsack Visualizer
+        </Typography>
       </div>
       <div className={classes.body}>
         <div className={classes.sidebar}></div>
