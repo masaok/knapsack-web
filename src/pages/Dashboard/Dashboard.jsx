@@ -1,7 +1,7 @@
 // import { useState, useEffect } from 'react'
 import { makeStyles } from '@mui/styles'
 
-import { Helmet } from 'react-helmet-async'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 
 import Typography from '@mui/material/Typography'
 
@@ -26,9 +26,10 @@ const useStyles = makeStyles(
     },
 
     pageTitle: {
-      color: 'white',
-      fontSize: 40,
-      fontFamily: ['Carter One', 'sans-serif'].join(','),
+      color: 'gold',
+      fontSize: 60,
+      // fontFamily: ['Carter One', 'sans-serif'].join(','),
+      fontFamily: 'Carter One',
       textShadow: '3px 3px 4px #000',
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
@@ -70,30 +71,32 @@ const Dashboard = props => {
   const classes = useStyles(props)
 
   return (
-    <div className={classes.root}>
-      <Helmet>
-        <title>Knapsack Visualizer</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
-          rel="stylesheet"
-        ></link>
-      </Helmet>
-      <div className={classes.header}>
-        <Typography variant="h2" className={classes.pageTitle}>
-          Knapsack Visualizer
-        </Typography>
-      </div>
-      <div className={classes.body}>
-        <div className={classes.sidebar}></div>
-        <div className={classes.content}>
-          <Routes>
-            <Route path="*" element={<KnapsackDynamic />} />
-            {/* <Route path="*" element={<KnapsackRecursion />} /> */}
-          </Routes>
+    <HelmetProvider>
+      <div className={classes.root}>
+        <Helmet>
+          <title>Knapsack Visualizer</title>
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
+            rel="stylesheet"
+          ></link>
+        </Helmet>
+        <div className={classes.header}>
+          <Typography variant="h2">
+            <span className={classes.pageTitle}>Knapsack Visualizer</span>
+          </Typography>
+        </div>
+        <div className={classes.body}>
+          <div className={classes.sidebar}></div>
+          <div className={classes.content}>
+            <Routes>
+              <Route path="*" element={<KnapsackDynamic />} />
+              {/* <Route path="*" element={<KnapsackRecursion />} /> */}
+            </Routes>
+          </div>
         </div>
       </div>
-    </div>
+    </HelmetProvider>
   )
 }
 

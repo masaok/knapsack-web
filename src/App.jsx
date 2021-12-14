@@ -36,6 +36,11 @@ const App = props => {
       <CssBaseline />
       <Helmet>
         <title>Hello World</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
+          rel="stylesheet"
+        ></link>
       </Helmet>
       <ThemeProvider theme={theme}>
         <div className={classes.root}>

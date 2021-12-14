@@ -127,9 +127,9 @@ const useStyles = makeStyles(
 // const MAX_WEIGHT = 2
 
 // Minimal
-const VALUES = [6, 10]
-const WEIGHTS = [1, 2]
-const MAX_WEIGHT = 1
+// const VALUES = [6, 10]
+// const WEIGHTS = [1, 2]
+// const MAX_WEIGHT = 1
 
 // Dev
 // const VALUES = [6, 10, 12]
@@ -138,9 +138,9 @@ const MAX_WEIGHT = 1
 
 // Geeks example
 // https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
-// const VALUES = [10, 15, 40]
-// const WEIGHTS = [1, 2, 3]
-// const MAX_WEIGHT = 6
+const VALUES = [10, 15, 40]
+const WEIGHTS = [1, 2, 3]
+const MAX_WEIGHT = 6
 
 // Educative example (fruit)
 // https://www.educative.io/edpresso/what-is-the-knapsack-problem
