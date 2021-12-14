@@ -134,8 +134,6 @@ const MAX_WEIGHT = 5
 const NUM_ITEMS = VALUES.length
 const MS = 100
 
-const INIT_TABLE = [[]]
-
 /* A Naive recursive implementation of 0-1 Knapsack problem
  * Credit: https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/
  */
@@ -192,7 +190,7 @@ const KnapsackDynamic = props => {
 
   const [addendValueIndex, setAddendValueIndex] = useState(null)
 
-  const [ms, setMs] = useState(MS)
+  const [ms] = useState(MS)
 
   // const [maxRow] = useState(1) // dev mode
   // const [maxCol] = useState(2) // dev mode
@@ -294,7 +292,7 @@ const KnapsackDynamic = props => {
     // If neither condition is true, the state doesn't change, which doesn't
     // recreate the timer, which doesn't trigger the useEffect. The loop
     // will stop.
-  }, [maxCol, maxRow, seconds, row, col])
+  }, [maxCol, maxRow, seconds, row, col, maxWeight, table, values, weights])
 
   useEffect(() => {
     const timeout = setTimeout(timer, ms)
@@ -302,7 +300,7 @@ const KnapsackDynamic = props => {
     // Make sure to clear the current timeout whenever a new timer is generated.
     // This ensures that only one timeout is active at a time.
     return () => clearTimeout(timeout)
-  }, [timer])
+  }, [timer, ms])
 
   const handleFieldChange = event => {
     console.log(event.target.name)
@@ -313,7 +311,7 @@ const KnapsackDynamic = props => {
     switch (event.target.name) {
       case 'weights':
       case 'values':
-        setFields({ ...fields, [event.target.name]: event.target.value.split(',') })
+        setFields({ ...fields, [event.target.name]: event.target.value.split(',').map(Number) })
         break
       case 'maxWeight':
         setFields({ ...fields, [event.target.name]: parseInt(event.target.value) })
@@ -365,7 +363,7 @@ const KnapsackDynamic = props => {
               name="weights"
               label="Weights"
               size="small"
-              value={fields.weights?.join(',')}
+              value={fields.weights.join(',')}
               onChange={handleFieldChange}
             />
           </div>
