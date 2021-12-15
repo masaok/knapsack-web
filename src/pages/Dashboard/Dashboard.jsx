@@ -18,8 +18,12 @@ const useStyles = makeStyles(
       height: '100vh',
     },
 
+    // Header
     header: {
       display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+      alignItems: 'center',
       justifyContent: 'center',
       marginTop: theme.spacing(3),
       marginBottom: theme.spacing(3),
@@ -28,13 +32,18 @@ const useStyles = makeStyles(
     pageTitle: {
       color: 'gold',
       fontSize: 60,
-      // fontFamily: ['Carter One', 'sans-serif'].join(','),
-      fontFamily: 'Carter One',
+      fontFamily: ['Carter One', 'sans-serif'].join(','),
       textShadow: '3px 3px 4px #000',
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
     },
 
+    description: {
+      marginTop: theme.spacing(3),
+      maxWidth: theme.spacing(70),
+    },
+
+    // Main Content
     body: {
       display: 'flex',
     },
@@ -85,6 +94,15 @@ const Dashboard = props => {
           <Typography variant="h2">
             <span className={classes.pageTitle}>Knapsack Visualizer</span>
           </Typography>
+          <div className={classes.description}>
+            <b>
+              The problem: fill a knapsack with the highest possible value items given a weight
+              limit.
+            </b>
+            &nbsp; Given a list of items with corresponding values and weights, this algorithm will
+            find the maximum value possible given the maximum weight constraint. Currently, each
+            item can be used only once (no repeats).
+          </div>
         </div>
         <div className={classes.body}>
           <div className={classes.sidebar}></div>

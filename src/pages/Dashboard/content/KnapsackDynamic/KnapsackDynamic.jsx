@@ -24,12 +24,17 @@ const useStyles = makeStyles(
       alignItems: 'center',
     },
 
-    // Larger Areas
+    // Top Area
     topArea: {
       display: 'flex',
       flexDirection: 'column',
       flex: 1,
+      alignItems: 'center',
       // backgroundColor: 'lightblue',
+    },
+
+    textField: {
+      paddingBottom: theme.spacing(1),
     },
 
     infoArea: {
@@ -102,7 +107,7 @@ const useStyles = makeStyles(
     inputs: {
       display: 'flex',
       flex: 1,
-      flexDirection: 'column',
+      // flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -394,47 +399,51 @@ const KnapsackDynamic = props => {
     <div className={classes.root}>
       <div className={classes.topArea}>
         <div className={classes.inputs}>
-          <div className={classes.fields}>
-            <TextField
-              name="weights"
-              label="Weights"
-              size="small"
-              value={weightsInput}
-              onChange={handleFieldChange}
-            />
+          <div>
+            <div className={clsx(classes.fields, classes.textField)}>
+              <TextField
+                name="weights"
+                label="Weights"
+                size="small"
+                value={weightsInput}
+                onChange={handleFieldChange}
+              />
+            </div>
+            <div className={classes.fields}>
+              <TextField
+                name="values"
+                label="Values"
+                size="small"
+                value={valuesInput}
+                onChange={handleFieldChange}
+              />
+            </div>
           </div>
-          <div className={classes.fields}>
-            <TextField
-              name="values"
-              label="Values"
-              size="small"
-              value={valuesInput}
-              onChange={handleFieldChange}
-            />
+          <div>
+            <div className={clsx(classes.fields, classes.textField)}>
+              <TextField
+                name="maxWeight"
+                label="Max Weight"
+                size="small"
+                value={maxWeightInput}
+                onChange={handleFieldChange}
+              />
+            </div>
+            <div className={classes.fields}>
+              <TextField
+                name="ms"
+                label="Milliseconds per tick"
+                size="small"
+                value={msInput}
+                onChange={handleFieldChange}
+              />
+            </div>
           </div>
-          <div className={classes.fields}>
-            <TextField
-              name="maxWeight"
-              label="Max Weight"
-              size="small"
-              value={maxWeightInput}
-              onChange={handleFieldChange}
-            />
-          </div>
-          <div className={classes.fields}>
-            <TextField
-              name="ms"
-              label="Milliseconds per tick"
-              size="small"
-              value={msInput}
-              onChange={handleFieldChange}
-            />
-          </div>
-          <div className={clsx(classes.fields, classes.updateButton)}>
-            <Button variant="contained" onClick={handleUpdate} disabled={errors.length > 0}>
-              Update
-            </Button>
-          </div>
+        </div>
+        <div className={clsx(classes.fields, classes.updateButton)}>
+          <Button variant="contained" onClick={handleUpdate} disabled={errors.length > 0}>
+            Update
+          </Button>
         </div>
       </div>
 
