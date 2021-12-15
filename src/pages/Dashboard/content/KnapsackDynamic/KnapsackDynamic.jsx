@@ -131,6 +131,7 @@ const useStyles = makeStyles(
 
     // Footer
     footer: {
+      marginBottom: theme.spacing(3),
       marginTop: theme.spacing(1),
     },
   }),
